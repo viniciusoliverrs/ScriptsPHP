@@ -33,7 +33,7 @@ function tableNames($connect)
 function createInstructionSQL()
 {
     $result = "";
-    $connect = dbConnect('localhost', 'root', '', 'acelke');
+    $connect = dbConnect('localhost', 'root', '', 'portalcondomin');
     $export_tables = tableNames($connect);
 
     foreach ($export_tables as $table) {
@@ -41,7 +41,7 @@ function createInstructionSQL()
         $columm_num = mysqli_num_fields($result_column); // Verifica número de colunas na tabela
         //echo "Tabela: {$table}</br>Número de colunas: {$columm_num} </br></br>"; // Mostra número de colunas da tabela
 
-        $result .=  "DELETE FROM TABLE ".$table.";"; //"DROP TABLE IF EXISTS {$table};"; //Intrução para apagar a tabela caso a mesma exista no Banco
+        $result .=  "DROP TABLE IF EXISTS ".$table.";"; //Intrução para apagar a tabela caso a mesma exista no Banco
         $create_result = getCreateTable($connect, $table); //Pesquisar como a coluna é criada
         $row_cr_col = mysqli_fetch_row($create_result);
         //echo"<pre>{$row_cr_col[1]}</pre>"; //Mostra estrutura da tabela
@@ -56,6 +56,11 @@ function createInstructionSQL()
                     $row_tp_col[$x] = str_replace("\n", "\\n", $row_tp_col[$x]); // Substitui todas as ocorrências da string \n pela \\n
                     if (isset($row_tp_col[$x])) {
                         if (!empty($row_tp_col[$x])) {
+                            if(!$x) {
+                                $result .= $row_tp_col[$x];
+                            } else {
+                                
+                            }
                             $result .= '`' . $row_tp_col[$x] . '`';
                         } else {
                             $result .= 'NULL';
@@ -120,7 +125,7 @@ function createFile($result, $ex)
 ------------------------------------------------
              Executar funções aqui 
 ------------------------------------------------
- */
+*/
 // Exportar tabelas 
 
 $result = createInstructionSQL();
@@ -137,7 +142,7 @@ foreach ($file as $row) {
     if (substr($row, 0, 2) == '--' || $row == '') continue;
     $tempLine .= $row;
     if (substr(trim($row), -1, 1) == ';') {
-        QueryM($connect, strval($row)) or print(mysqli_error($connect));
+        QueryM($connect, strval($row));// or print(mysqli_error($connect));
         $tempLine = '';
     }
 }
